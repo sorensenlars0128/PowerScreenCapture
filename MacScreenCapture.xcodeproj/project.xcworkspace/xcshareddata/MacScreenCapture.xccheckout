@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>1EA55552-D3AD-43CB-B575-7C834C1CA885</string>
+	<key>IDESourceControlProjectName</key>
+	<string>MacScreenCapture</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>D6F588A81530094B5F2A86358E612DA2D50FA997</key>
+		<string>https://github.com/sorensenlars0128/MacScreenCapture.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>MacScreenCapture.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>D6F588A81530094B5F2A86358E612DA2D50FA997</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/sorensenlars0128/MacScreenCapture.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>D6F588A81530094B5F2A86358E612DA2D50FA997</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>D6F588A81530094B5F2A86358E612DA2D50FA997</string>
+			<key>IDESourceControlWCCName</key>
+			<string>MacScreenCapture</string>
+		</dict>
+	</array>
+</dict>
+</plist>
