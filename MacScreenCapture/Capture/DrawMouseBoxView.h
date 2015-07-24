@@ -64,12 +64,14 @@
 @property(readwrite, weak) id <DrawMouseBoxViewDelegate> delegate;
 @property (nonatomic, assign) bool recording;
 @property (nonatomic, assign) float backingScaleFactor;
+@property (nonatomic, assign) bool customSelectionMode;
 
 - (void) setRecordingValue:(bool) val;
 - (BOOL)acceptsFirstResponder;
 - (BOOL)acceptsMouseMovedEvents;
 - (void)keyDown:(NSEvent *)theEvent;
 -(void) setBackingScaleFactorValue:(float)val;
+-(void) setFullScreenCapture;
 
 @end
 

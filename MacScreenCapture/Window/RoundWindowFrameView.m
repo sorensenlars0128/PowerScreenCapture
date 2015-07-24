@@ -142,6 +142,8 @@
 -(void) awakeFromNib
 {
     [self.tableView setDoubleAction:@selector(DoubleClickOnTableRow)];
+//    [self.selectModeButton setTarget:self];
+//    [self.selectModeButton setAction:@selector(SelectionModeChanged)];
 }
 -(void) DoubleClickOnTableRow{
     NSInteger row_Ind = [self.tableView clickedRow];
@@ -182,9 +184,9 @@
     [self addSubview:btn_pause];
     [btn_pause setHidden:YES];
     
-    settingFolderButton = [[ImageButton alloc] initWithFrame:@"fileBrowserButton.png" strHighLightFileName:@"fileBrowserButton.png" strClickedFileName:@"fileBrowserButton.png" strBackgroundFileName:nil strLabel:nil btnSize:NSMakeSize(35, 35) btnPos:NSMakePoint(324, 190) pTarget:self selector:@selector(selectFolder:)];
+    settingFolderButton = [[ImageButton alloc] initWithFrame:@"fileBrowserButton.png" strHighLightFileName:@"fileBrowserButton.png" strClickedFileName:@"fileBrowserButton.png" strBackgroundFileName:nil strLabel:nil btnSize:NSMakeSize(35, 35) btnPos:NSMakePoint(324, 200) pTarget:self selector:@selector(selectFolder:)];
     
-    statusLoginButton = [[ImageButton alloc] initWithFrame:@"switchOffButton.png" strHighLightFileName:@"switchOffButton.png" strClickedFileName:@"switchOffButton.png" strBackgroundFileName:nil strLabel:nil btnSize:NSMakeSize(100, 40) btnPos:NSMakePoint(270, 250) pTarget:self selector:@selector(selectStatusLogin:)];
+    statusLoginButton = [[ImageButton alloc] initWithFrame:@"switchOffButton.png" strHighLightFileName:@"switchOffButton.png" strClickedFileName:@"switchOffButton.png" strBackgroundFileName:nil strLabel:nil btnSize:NSMakeSize(100, 40) btnPos:NSMakePoint(270, 260) pTarget:self selector:@selector(selectStatusLogin:)];
     
     [self addSubview:statusLoginButton];
     [statusLoginButton setHidden:YES];
@@ -206,7 +208,7 @@
     [arrowButtonRight setHidden:YES];
     
     [self setSavedData];
-    
+    [_prefView setHidden:NO];
 }
 - (void) loadSavedData
 {
@@ -219,8 +221,15 @@
     }
     
     savePath = [[NSUserDefaults standardUserDefaults] stringForKey:@"SavePath"];
-    if( savePath == nil )
-        savePath = [[Helper realHomeDirectory] stringByAppendingPathComponent:@"Movies"];
+    if(savePath == nil ){
+        NSString *defaultSavePath = [NSString stringWithFormat:@"%@/%@", @"Movies", [[NSBundle mainBundle] bundleIdentifier]];
+        
+        savePath = [[Helper realHomeDirectory] stringByAppendingPathComponent:defaultSavePath];
+        if(![[NSFileManager defaultManager] fileExistsAtPath:savePath]){
+            [[NSFileManager defaultManager] createDirectoryAtPath:savePath withIntermediateDirectories:YES attributes:nil error:nil];
+        }
+        [self setSavePath:savePath];
+    }
     
     if(!(formatText = [[NSUserDefaults standardUserDefaults] stringForKey:@"FormatText"]) || [formatText length] == 0){
         [self setFormatText:@"MPEG 4"];
@@ -233,6 +242,9 @@
     if(!(startAtLoginValue = [[NSUserDefaults standardUserDefaults] boolForKey:@"StartatLogin"])){
         [self setStartAtLoginValue:false];
     }
+    customAreaSelection = [[NSUserDefaults standardUserDefaults] boolForKey:@"CustomSelectionMode"];
+    [self setCustomSelectionModeValue:customAreaSelection];
+    
     
     [self updateHistory];
 }
@@ -268,7 +280,14 @@
 {
     return  startAtLoginValue;
 }
-
+-(void) setCustomSelectionModeValue:(bool)val
+{
+    customAreaSelection = val;
+}
+-(bool) getCustomSelectionModeValue
+{
+    return  customAreaSelection;
+}
 - (void) setSavedData
 {
     [self.folderPath setStringValue:savePath];
@@ -288,6 +307,13 @@
         [statusLoginButton setImage:[NSImage imageNamed:@"switchOffButton.png"]];
         [statusLoginButton setHidden:YES];
     }
+    
+    if(customAreaSelection){
+        [_selectModeButton setSelected:YES forSegment:0];
+    }else{
+        [_selectModeButton setSelected:YES forSegment:1];
+    }
+    
     [self.qualitySlider setIntegerValue:qualityLevel];
     [self display];
 }
@@ -336,13 +362,13 @@
     [settingFolderButton setHidden:YES];
     [statusLoginButton setHidden:YES];
     
-    [self.prefInfo setHidden:NO];
-    [self.prefSetting setHidden:YES];
-    [self.prefView setHidden:YES];
-  
+    [_prefInfo setHidden:NO];
+    [_prefSetting setHidden:YES];
+    [_prefView setHidden:YES];
+    //[self.delegate setPrefInfoVisible:NO];
+   
     
 }
-
 - (void)OnclickPower
 {
     [[NSApplication sharedApplication] terminate:self];
@@ -458,7 +484,17 @@
     [self setQualityLevel:[_qualitySlider intValue]];
     [defaults setInteger:qualityLevel forKey:@"QualityLevel"];
 }
-
+-(IBAction)SelectionModeChanged:(id)sender
+{
+    NSInteger sel_val = [self.selectModeButton selectedSegment];
+    if(sel_val == 0){
+        [self setCustomSelectionModeValue:YES];
+    }else{
+        [self setCustomSelectionModeValue:NO];
+    }
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setBool:[self getCustomSelectionModeValue] forKey:@"CustomSelectionMode"];
+}
 - (IBAction)OnFormatChanged:(id)sender
 {
     //    NSPopUpButton *formatButton = (NSPopUpButton* )sender;

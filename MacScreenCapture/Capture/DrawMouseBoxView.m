@@ -56,7 +56,6 @@
     
     NSTimer* timerScanning;
     bool recordingmark_visible;
-    
 }
 
 
@@ -74,6 +73,7 @@
     if(self){
         self.recording = false;
         self.backingScaleFactor = 1.0;
+        self.customSelectionMode = true;
         NSTrackingArea* trackingArea = [[NSTrackingArea alloc] initWithRect:frameRect options:(NSTrackingMouseEnteredAndExited|NSTrackingMouseMoved|NSTrackingActiveAlways|NSTrackingInVisibleRect|NSTrackingActiveInKeyWindow) owner:self userInfo:nil];
         [self addTrackingArea:trackingArea];
      }
@@ -134,6 +134,33 @@
     recordingmark_visible = !recordingmark_visible;
     [self display];
 }
+-(void) setFullScreenCapture
+{
+    _selectionRect = self.bounds;
+
+    NSRect dispRect;
+    dispRect.origin.x = _selectionRect.origin.x*self.backingScaleFactor;
+    dispRect.origin.y = _selectionRect.origin.y*self.backingScaleFactor;
+    dispRect.size.width = _selectionRect.size.width*self.backingScaleFactor;
+    dispRect.size.height = _selectionRect.size.height*self.backingScaleFactor;
+    
+    [self.window setLevel:kRecordingShadyWindowLevel];
+    [self.window setIgnoresMouseEvents:YES];
+    [self.delegate drawMouseBoxView:self didSelectRect:dispRect BackingScaleFactor:self.backingScaleFactor];
+    [self setRecordingValue:true];
+    [self.window setAlphaValue:0.85];
+    [self.window setOpaque:NO];
+    [self display];
+    
+    
+    [timerScanning invalidate];
+    timerScanning = nil;
+    
+    timerScanning = [NSTimer scheduledTimerWithTimeInterval:1.0f target:self selector:@selector(SetElapsedTime) userInfo:self repeats:YES];
+    
+    [[NSCursor arrowCursor] set];
+
+}
 - (void)mouseUp:(NSEvent *)theEvent
 {
         NSPoint mouseUpPoint = [theEvent locationInWindow];
@@ -172,6 +199,10 @@
 {
     if(!self.recording){
         [[NSCursor crosshairCursor] set];
+        [self display];
+        if(!self.customSelectionMode){
+            [self setFullScreenCapture];
+        }
     }
 }
 
@@ -196,47 +227,56 @@
         [[NSCursor crosshairCursor] set];
     }
 }
+
 - (void)drawRect:(NSRect)dirtyRect
 {
-    if(!self.recording){
-        [[NSCursor crosshairCursor] set];
-    }
+    if(self.customSelectionMode){
+        if(!self.recording){
+            [[NSCursor crosshairCursor] set];
+            [self drawLabel];
+        }
 
     //	NSFrameRect(_selectionRect);
-    if((_selectionRect.size.height <= 30) || (_selectionRect.size.width <= 30)){
-        return;
-    }
+        if((_selectionRect.size.height <= 30) || (_selectionRect.size.width <= 30)){
+            return;
+        }
     
-    if(self.recording)
-    {
+    
+        if(self.recording)
+        {
+            [[NSColor clearColor] setFill];
+            NSRectFill(dirtyRect);
+        
+            if(recordingmark_visible){
+                [[NSColor redColor] setStroke];
+            }else{
+                [[NSColor clearColor] setStroke];
+            }
+            [[NSCursor arrowCursor] set];
+            
+        }else{
+            [[NSColor colorWithCalibratedWhite:0.0 alpha:0.5] setFill];
+            NSRectFill(dirtyRect);
+        
+            [[NSColor whiteColor] setFill];
+            NSRectFill(_selectionRect);
+        
+            [[NSGraphicsContext currentContext] setShouldAntialias: NO];
+            [[NSColor yellowColor] setStroke];
+        
+            /*
+             [[NSColor blueColor] setStroke];
+             NSBezierPath *line = [NSBezierPath bezierPathWithRect:NSIntegralRect(_cropRect)];
+             line.lineWidth = 1;
+             [line stroke];
+             */
+       
+        }
+    }else{
         [[NSColor clearColor] setFill];
         NSRectFill(dirtyRect);
-        
-        if(recordingmark_visible){
-            [[NSColor redColor] setStroke];
-        }else{
-            [[NSColor clearColor] setStroke];
-        }
-        [[NSCursor arrowCursor] set];
-
-    }else{
-        [[NSColor colorWithCalibratedWhite:0.0 alpha:0.5] setFill];
-        NSRectFill(dirtyRect);
-        
-        [[NSColor whiteColor] setFill];
-        NSRectFill(_selectionRect);
-        
-        [[NSGraphicsContext currentContext] setShouldAntialias: NO];
-        [[NSColor yellowColor] setStroke];
-        
-        /*
-         [[NSColor blueColor] setStroke];
-         NSBezierPath *line = [NSBezierPath bezierPathWithRect:NSIntegralRect(_cropRect)];
-         line.lineWidth = 1;
-         [line stroke];
-         */
+        _selectionRect = self.bounds;
     }
-    
     NSBezierPath *line = [NSBezierPath bezierPath];
     line.lineWidth = 3;
     
@@ -274,6 +314,20 @@
     
     [line stroke];
     
+}
+- (void)drawLabel {
+    NSMutableParagraphStyle *paragraph = [[NSMutableParagraphStyle alloc] init];
+    paragraph.alignment = NSCenterTextAlignment;
+    
+    NSAttributedString *labelToDraw = [[NSAttributedString alloc] initWithString:@"Please drag to select capture area or press 'Esc' key to cancel."
+                                                                      attributes:@{NSFontAttributeName: [NSFont systemFontOfSize:30],
+                                                                                   NSForegroundColorAttributeName : [NSColor whiteColor],
+                                                                                   NSParagraphStyleAttributeName : paragraph}];
+    NSRect centeredRect;
+    centeredRect.size = labelToDraw.size;
+    centeredRect.origin.x = (self.bounds.size.width - centeredRect.size.width) / 2.0;
+    centeredRect.origin.y = self.bounds.size.height - centeredRect.size.height*3;
+    [labelToDraw drawInRect:centeredRect];
 }
 
 @end

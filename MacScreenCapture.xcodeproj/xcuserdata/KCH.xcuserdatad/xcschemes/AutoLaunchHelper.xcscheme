@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "EE336A4B1AE0A44F001F6108"
-               BuildableName = "PowerScreenCapture.app"
-               BlueprintName = "PowerScreenCapture"
+               BlueprintIdentifier = "500664931B56A8420088E89C"
+               BuildableName = "AutoLaunchHelper.app"
+               BlueprintName = "AutoLaunchHelper"
                ReferencedContainer = "container:MacScreenCapture.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +32,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "EE336A4B1AE0A44F001F6108"
-            BuildableName = "PowerScreenCapture.app"
-            BlueprintName = "PowerScreenCapture"
+            BlueprintIdentifier = "500664931B56A8420088E89C"
+            BuildableName = "AutoLaunchHelper.app"
+            BlueprintName = "AutoLaunchHelper"
             ReferencedContainer = "container:MacScreenCapture.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -52,9 +52,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "EE336A4B1AE0A44F001F6108"
-            BuildableName = "PowerScreenCapture.app"
-            BlueprintName = "PowerScreenCapture"
+            BlueprintIdentifier = "500664931B56A8420088E89C"
+            BuildableName = "AutoLaunchHelper.app"
+            BlueprintName = "AutoLaunchHelper"
             ReferencedContainer = "container:MacScreenCapture.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -71,9 +71,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "EE336A4B1AE0A44F001F6108"
-            BuildableName = "PowerScreenCapture.app"
-            BlueprintName = "PowerScreenCapture"
+            BlueprintIdentifier = "500664931B56A8420088E89C"
+            BuildableName = "AutoLaunchHelper.app"
+            BlueprintName = "AutoLaunchHelper"
             ReferencedContainer = "container:MacScreenCapture.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

@@ -4,6 +4,11 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>AutoLaunchHelper.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
 		<key>MacScreenCapture.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -12,6 +17,11 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>500664931B56A8420088E89C</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>EE336A4B1AE0A44F001F6108</key>
 		<dict>
 			<key>primary</key>

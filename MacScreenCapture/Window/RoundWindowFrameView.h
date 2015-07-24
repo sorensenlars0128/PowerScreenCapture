@@ -23,21 +23,32 @@
 
 @end
 
+@class RoundWindowFrameView;
+
+@protocol RoundWindowFrameViewDelegate<NSObject>
+- (void) setPrefInfoVisible:(float)value;
+//- (void) OnClickInfo;
+
+@end
+
+
 @interface RoundWindowFrameView : NSView <NSTableViewDataSource, NSTableViewDelegate>
 {
     NSString *savePath;
     bool startAtLoginValue;
     NSInteger qualityLevel;
     NSString *formatText;
+    bool customAreaSelection;
     NSMutableArray *mData;
     NSMutableArray * removeArray;
     NSMutableArray * historyArray;
     NSString * filePath_saved;
 }
+    @property(readwrite, weak) id <RoundWindowFrameViewDelegate> delegate;
 
-    @property (strong) IBOutlet NSView *prefView;
-    @property (strong) IBOutlet NSView *prefSetting;
-    @property (strong) IBOutlet NSView *prefInfo;
+    @property (assign) IBOutlet NSView *prefView;
+    @property (assign) IBOutlet NSView *prefSetting;
+    @property (assign) IBOutlet NSView *prefInfo;
     @property (strong) IBOutlet NSTextField *folderPath;
 
     @property (strong, nonatomic) ImageButton *btn_record;
@@ -57,9 +68,11 @@
     @property (strong) IBOutlet NSMatrix * formatButton;
     @property (strong) IBOutlet NSSlider *qualitySlider;
     @property (strong) IBOutlet NSTableView *tableView;
+    @property (strong) IBOutlet NSSegmentedControl *selectModeButton;
 
     - (IBAction)OnQualityChanged:(id)sender;
     - (IBAction)OnFormatChanged:(id)sender;
+    - (IBAction)SelectionModeChanged:(id)sender;
 
     - (void) loadSavedData;
     - (void) setSavedData;
@@ -72,6 +85,8 @@
     -(void) setFormatText:(NSString*) val;
     -(NSString*) getFormatText;
     -(void) setStartAtLoginValue:(bool)val;
+    -(bool) getCustomSelectionModeValue;
+    -(void) setCustomSelectionModeValue:(bool)val;
     -(bool) getStartAtLoginValue;
     -(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView;
     - (NSView *)tableView:(NSTableView *)tableView

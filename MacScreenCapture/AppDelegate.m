@@ -33,7 +33,7 @@
 
 
 
-@interface AppDelegate () <AVCaptureFileOutputDelegate,AVCaptureFileOutputRecordingDelegate,DrawMouseBoxViewDelegate,GifExporterDelegate, NSMenuDelegate>
+@interface AppDelegate () <AVCaptureFileOutputDelegate,AVCaptureFileOutputRecordingDelegate,DrawMouseBoxViewDelegate,GifExporterDelegate, NSMenuDelegate, RoundWindowFrameViewDelegate>
 
 @property (strong, nonatomic) NSStatusItem*statusItem;
 @property (strong) AVCaptureSession *captureSession;
@@ -88,6 +88,8 @@
     
     
     [_frameView loadSavedData];
+    [_frameView setDelegate:self];
+    
     self.is_recording = false;
     gifFrameArray = [NSMutableArray array];
     
@@ -244,10 +246,10 @@
         
         NSLog(@"%@", error);
         
-        if (!error) {
+//        if (!error) {
             [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:@[newURL]];
             [self.frameView updateHistory];
-        }
+//        }
         
     } else if (button == NSAlertAlternateReturn) {
         [self.frameView updateHistory];
@@ -383,13 +385,18 @@
     globalRect = NSOffsetRect(globalRect, windowRect.origin.x, windowRect.origin.y);
     globalRect.origin.y = CGDisplayPixelsHigh(CGMainDisplayID()) - globalRect.origin.y;
     CGDirectDisplayID displayID = display;
+    
     uint32_t matchingDisplayCount = 0;
     /* Get a list of online displays with bounds that include the specified point. */
-    CGError e = CGGetDisplaysWithPoint(NSPointToCGPoint(globalRect.origin), 1, &displayID, &matchingDisplayCount);
-    if ((e == kCGErrorSuccess) && (1 == matchingDisplayCount))
-    {
-        
-        /* Add the display as a capture input. */
+    if([self.frameView getCustomSelectionModeValue]){
+        CGError e = CGGetDisplaysWithPoint(NSPointToCGPoint(globalRect.origin), 1, &displayID, &matchingDisplayCount);
+    
+        if ((e == kCGErrorSuccess) && (1 == matchingDisplayCount))
+        {
+              /* Add the display as a capture input. */
+        }
+    }else{
+        displayID = CGMainDisplayID();
     }
     
     for (NSWindow* w in [NSApp windows])
@@ -427,7 +434,6 @@
     }
     
 }
-
 - (void)startGeneratingGif
 {
     if(!self.is_recording){
@@ -589,18 +595,39 @@
 
 - (void)setDisplayAndCropRect
 {
-    
     if(!shadeWindows) {
         shadeWindows = [NSMutableArray array];
     }
-    
-    for (NSScreen* screen in [NSScreen screens])
-    {
+    if([self.frameView getCustomSelectionModeValue]){
+       
+        for (NSScreen* screen in [NSScreen screens])
+        {
+            float dispScale=[screen backingScaleFactor];
+        
+            NSRect frame = [screen frame];
+            BorderlessWindow * window = [[BorderlessWindow alloc] initWithContentRect:frame styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO];
+            [window setBackgroundColor:[NSColor blackColor]];
+            [window setAlphaValue:.5];
+            [window setLevel:kShadyWindowLevel];
+            [window setReleasedWhenClosed:NO];
+            [window setOpaque:YES];
+        
+            DrawMouseBoxView* drawMouseBoxView = [[DrawMouseBoxView alloc] initWithFrame:frame];
+            drawMouseBoxView.delegate = self;
+            [drawMouseBoxView setBackingScaleFactorValue:dispScale];
+            [drawMouseBoxView setCustomSelectionMode:YES];
+            [window makeFirstResponder:drawMouseBoxView];
+            [window setContentView:drawMouseBoxView];
+            [window makeKeyAndOrderFront:self];
+            [shadeWindows addObject:window];
+        }
+    }else{
+        NSScreen* screen = [NSScreen mainScreen];
         float dispScale=[screen backingScaleFactor];
         
         NSRect frame = [screen frame];
         BorderlessWindow * window = [[BorderlessWindow alloc] initWithContentRect:frame styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO];
-        [window setBackgroundColor:[NSColor blackColor]];
+        [window setBackgroundColor:[NSColor clearColor]];
         [window setAlphaValue:.5];
         [window setLevel:kShadyWindowLevel];
         [window setReleasedWhenClosed:NO];
@@ -609,6 +636,7 @@
         DrawMouseBoxView* drawMouseBoxView = [[DrawMouseBoxView alloc] initWithFrame:frame];
         drawMouseBoxView.delegate = self;
         [drawMouseBoxView setBackingScaleFactorValue:dispScale];
+        [drawMouseBoxView setCustomSelectionMode:NO];
         [window makeFirstResponder:drawMouseBoxView];
         [window setContentView:drawMouseBoxView];
         [window makeKeyAndOrderFront:self];
@@ -618,8 +646,14 @@
 -(NSString*) getSaveLocation
 {
     NSString *savePath = [[NSUserDefaults standardUserDefaults] stringForKey:@"SavePath"];
-    if( savePath == nil )
-        savePath = [[Helper realHomeDirectory] stringByAppendingPathComponent:@"Movies"];
+    if(savePath == nil ){
+        NSString *defaultSavePath = [NSString stringWithFormat:@"%@/%@", @"Movies", [[NSBundle mainBundle] bundleIdentifier]];
+        
+        savePath = [[Helper realHomeDirectory] stringByAppendingPathComponent:defaultSavePath];
+        if(![[NSFileManager defaultManager] fileExistsAtPath:savePath]){
+            [[NSFileManager defaultManager] createDirectoryAtPath:savePath withIntermediateDirectories:YES attributes:nil error:nil];
+        }
+    }
 //
     NSString * tempFileName = [self captureTemporaryFilePath];
     NSString *filePath = [savePath stringByAppendingPathComponent:tempFileName];
@@ -832,4 +866,28 @@
 - (void)gifExporterIsProcessing:(GifExporter *)exporter
 {
 }
+
+- (void) setPrefInfoVisible:(float)value
+{
+    [self.frameView.prefView setHidden:!value];
+}
+/*
+- (void) OnClickInfo
+{
+    self.frameView.prefTitle.frame = NSRectFromCGRect(CGRectMake(115, 20, 170, 30));
+    [self.frameView.prefTitle setImage:[NSImage imageNamed:@"aboutTitle.png"]];
+    [self.frameView.btn_arrow setHidden:NO];
+    [self.frameView.btn_info setHidden:YES];
+    [self.frameView.btn_setting setHidden:YES];
+    [self.frameView.btn_pause setHidden:YES];
+    [self.frameView.arrowButtonRight setHidden:YES];
+    [self.frameView.settingFolderButton setHidden:YES];
+    [self.frameView.statusLoginButton setHidden:YES];
+    
+    [self.frameView.prefInfo setHidden:NO];
+    [self.frameView.prefSetting setHidden:YES];
+    [self.frameView.prefView setHidden:YES];
+
+}
+ */
 @end
