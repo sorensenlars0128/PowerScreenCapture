@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "-[NSAlert(Popover) stopSynchronousPopoverAlert:]:NSAlert+Popover.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.completionBlock">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "-[RoundWindowFrameView setHistoryData:]:RoundWindowFrameView.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[RoundWindowFrameView getSortedFilesFromFolder:]:RoundWindowFrameView.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "filesArray">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>
